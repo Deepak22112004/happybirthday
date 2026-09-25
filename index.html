@@ -523,9 +523,9 @@
 </head>
 
 <body>
-  <audio id="bgMusic" loop style="display:none;">
-    <source src="./imge/54172.mp3" type="audio/mpeg">
-    Your browser does not support HTML audio.
+  <audio id="bgMusic" loop preload="auto" style="display:none;"></audio>
+  <source src="./imge/54172.mp3" type="audio/mpeg">
+  Your browser does not support HTML audio.
   </audio>
   <div class="stage">
 
@@ -766,6 +766,7 @@
       noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodgeNo(); }, { passive: false });
       const bgMusic = document.getElementById("bgMusic");
       bgMusic.volume = 1.0;
+      bgMusic.load(); // start fetching/buffering the file immediately on page open
 
       // First real tap on YES: this user gesture satisfies mobile's
       // autoplay policy, so we start the music here. Navigation to
@@ -794,31 +795,31 @@
       // ---- candles ----
       const candlesG = document.getElementById('candles');
 
-        const candleColors = [
-          '#e8564c',
-          '#e0a628',
-          '#4aa3df',
-          '#55b89a',
-          '#e8564c',
-          '#e0a628'
-        ];
+      const candleColors = [
+        '#e8564c',
+        '#e0a628',
+        '#4aa3df',
+        '#55b89a',
+        '#e8564c',
+        '#e0a628'
+      ];
 
-        const count = 6;
-        const startX = 55;
-        const gap = 22;
+      const count = 6;
+      const startX = 55;
+      const gap = 22;
 
-        for (let i = 0; i < count; i++) {
-          const x = startX + i * gap;
+      for (let i = 0; i < count; i++) {
+        const x = startX + i * gap;
 
-          const g = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'g'
-          );
+        const g = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'g'
+        );
 
-          g.setAttribute('class', 'candle');
-          g.setAttribute('data-i', i);
+        g.setAttribute('class', 'candle');
+        g.setAttribute('data-i', i);
 
-          g.innerHTML = `
+        g.innerHTML = `
         <!-- candle -->
         <rect
             x="${x - 3}"
@@ -857,75 +858,75 @@
         </g>
     `;
 
-          candlesG.appendChild(g);
+        candlesG.appendChild(g);
+      }
+
+      const wishMsg = document.getElementById('wishMsg');
+
+      function checkCandles() {
+        const all = document.querySelectorAll('#candles .candle');
+        const outCount = document.querySelectorAll('#candles .candle.out').length;
+
+        if (outCount === all.length) {
+          wishMsg.textContent = 'Your wish will come true ✨';
+          burstConfetti();
+        } else {
+          wishMsg.textContent = '';
         }
+      }
 
-        const wishMsg = document.getElementById('wishMsg');
+      candlesG.addEventListener('click', e => {
+        const c = e.target.closest('.candle');
 
-        function checkCandles() {
-          const all = document.querySelectorAll('#candles .candle');
-          const outCount = document.querySelectorAll('#candles .candle.out').length;
+        if (!c) return;
 
-          if (outCount === all.length) {
-            wishMsg.textContent = 'Your wish will come true ✨';
-            burstConfetti();
-          } else {
-            wishMsg.textContent = '';
-          }
+        c.classList.toggle('out');
+        checkCandles();
+      });
+
+      // ---- memories title colors ----
+      const memTitle = document.getElementById('memTitle');
+      const letters = 'MEMORIES'.split('');
+      const bg = ['#b8272c', '#e0a628', '#e8564c'];
+      letters.forEach((ch, i) => {
+        const s = document.createElement('span');
+        s.textContent = ch;
+        s.style.background = bg[i % bg.length];
+        s.style.transform = 'rotate(' + ((i % 2 === 0 ? -4 : 4)) + 'deg)';
+        memTitle.appendChild(s);
+      });
+
+      // ---- memories photo slots ----
+      const memRow = document.getElementById('memRow');
+
+      const memories = [
+        {
+          image: './imge/IMG20251122161603.jpg',
+          caption: 'first date'
+        },
+        {
+          image: './imge/Snapchat-630699036.jpg',
+          caption: 'that trip'
+        },
+        {
+          image: './imge/IMG20260411122843.jpg',
+          caption: 'our song'
+        },
+        {
+          image: './imge/IMG20251122162520.jpg',
+          caption: 'just us'
+        },
+        {
+          image: './imge/IMG-20260617-WA0037.jpg',
+          caption: 'forever'
         }
+      ];
 
-        candlesG.addEventListener('click', e => {
-          const c = e.target.closest('.candle');
+      memories.forEach((memory) => {
+        const slot = document.createElement('div');
+        slot.className = 'mem-slot';
 
-          if (!c) return;
-
-          c.classList.toggle('out');
-          checkCandles();
-        });
-
-        // ---- memories title colors ----
-        const memTitle = document.getElementById('memTitle');
-        const letters = 'MEMORIES'.split('');
-        const bg = ['#b8272c', '#e0a628', '#e8564c'];
-        letters.forEach((ch, i) => {
-          const s = document.createElement('span');
-          s.textContent = ch;
-          s.style.background = bg[i % bg.length];
-          s.style.transform = 'rotate(' + ((i % 2 === 0 ? -4 : 4)) + 'deg)';
-          memTitle.appendChild(s);
-        });
-
-        // ---- memories photo slots ----
-        const memRow = document.getElementById('memRow');
-
-        const memories = [
-          {
-            image: './imge/IMG20251122161603.jpg',
-            caption: 'first date'
-          },
-          {
-            image: './imge/Snapchat-630699036.jpg',
-            caption: 'that trip'
-          },
-          {
-            image: './imge/IMG20260411122843.jpg',
-            caption: 'our song'
-          },
-          {
-            image: './imge/IMG20251122162520.jpg',
-            caption: 'just us'
-          },
-          {
-            image: './imge/IMG-20260617-WA0037.jpg',
-            caption: 'forever'
-          }
-        ];
-
-        memories.forEach((memory) => {
-          const slot = document.createElement('div');
-          slot.className = 'mem-slot';
-
-          slot.innerHTML = `
+        slot.innerHTML = `
         <div class="peg"></div>
 
         <div class="box">
@@ -939,31 +940,31 @@
         </div>
     `;
 
-          memRow.appendChild(slot);
-        });
+        memRow.appendChild(slot);
+      });
 
-        // ---- confetti burst ----
-        function burstConfetti() {
-          const colors = ['#b8272c', '#e0a628', '#e8564c', '#f3c9c2'];
-          for (let i = 0; i < 40; i++) {
-            const p = document.createElement('div');
-            p.className = 'confetti-piece';
-            const size = 6 + Math.random() * 6;
-            p.style.width = size + 'px';
-            p.style.height = (size * 0.6) + 'px';
-            p.style.background = colors[Math.floor(Math.random() * colors.length)];
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
-            document.body.appendChild(p);
-            const duration = 1800 + Math.random() * 1200;
-            p.animate([
-              { transform: p.style.transform + ' translateY(0)', opacity: 1 },
-              { transform: p.style.transform + ' translateY(100vh)', opacity: .9 }
-            ], { duration, easing: 'ease-in' });
-            setTimeout(() => p.remove(), duration + 50);
-          }
+      // ---- confetti burst ----
+      function burstConfetti() {
+        const colors = ['#b8272c', '#e0a628', '#e8564c', '#f3c9c2'];
+        for (let i = 0; i < 40; i++) {
+          const p = document.createElement('div');
+          p.className = 'confetti-piece';
+          const size = 6 + Math.random() * 6;
+          p.style.width = size + 'px';
+          p.style.height = (size * 0.6) + 'px';
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          p.style.left = Math.random() * 100 + 'vw';
+          p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+          document.body.appendChild(p);
+          const duration = 1800 + Math.random() * 1200;
+          p.animate([
+            { transform: p.style.transform + ' translateY(0)', opacity: 1 },
+            { transform: p.style.transform + ' translateY(100vh)', opacity: .9 }
+          ], { duration, easing: 'ease-in' });
+          setTimeout(() => p.remove(), duration + 50);
         }
-      })();
+      }
+    })();
   </script>
 </body>
 
