@@ -767,10 +767,16 @@
       bgMusic.volume = 1.0;
 
       // Try to start automatically when page opens
+<<<<<<< HEAD
       document.getElementById('yesBtn').addEventListener("click", () => {
         bgMusic.play().catch(() => {
           console.log("Autoplay blocked. Waiting for user interaction.");
           go(1);
+=======
+      window.addEventListener("load", () => {
+        bgMusic.play().catch(() => {
+          console.log("Autoplay blocked. Waiting for user interaction.");
+>>>>>>> 1fec98524594ebabd858e4f1757ab8fd28e81385
         });
       });
       // ---- gifts ----
