@@ -448,6 +448,19 @@
       color: var(--red);
     }
 
+    .image-fallback {
+      display: none;
+      position: absolute;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      background: var(--pink);
+    }
+
+    .image-error .image-fallback {
+      display: flex;
+    }
+
     .mem-slot input {
       display: none;
     }
@@ -512,6 +525,7 @@
 <body>
   <audio id="bgMusic" loop style="display:none;">
     <source src="./imge/54172.mp3" type="audio/mpeg">
+    Your browser does not support HTML audio.
   </audio>
   <div class="stage">
 
@@ -525,38 +539,7 @@
         <img class="chibi"
           src="./imge/Crayon Shinchan Dancing GIF - Crayon Shinchan Dancing Party Hard - Discover & Share GIFs.gif"
           alt="Chibi image">
-        <ellipse cx="60" cy="120" rx="32" ry="6" fill="#e8d5cf" />
-        <path d="M33 72 q27 -16 54 0 l5 42 q-32 13 -64 0 z" fill="var(--red)" />
-        <path d="M60 78 l-6 10 l6 6 l6 -6 z" fill="#fff" />
-        <ellipse cx="24" cy="54" rx="11" ry="13" fill="#2c1810" transform="rotate(-18 24 54)" />
-        <ellipse cx="96" cy="54" rx="11" ry="13" fill="#2c1810" transform="rotate(18 96 54)" />
-        <path d="M16 44 q-4 10 4 20" stroke="#2c1810" stroke-width="5" fill="none" stroke-linecap="round" />
-        <path d="M104 44 q4 10 -4 20" stroke="#2c1810" stroke-width="5" fill="none" stroke-linecap="round" />
-        <circle cx="60" cy="46" r="29" fill="#ffdcb8" />
-        <path
-          d="M31 44 q-1 -32 29 -32 q30 0 29 32 q-5 -10 -13 -12 q2 5 -3 6 q-2 -7 -9 -8 q1 5 -4 6 q-3 -7 -10 -6 q2 4 -3 5 q-3 -6 -9 -4 q2 4 -3 5 q-3 -5 -4 8z"
-          fill="#2c1810" />
-        <path d="M42 38 q4 -3 8 0" stroke="#2c1810" stroke-width="2.2" fill="none" stroke-linecap="round" />
-        <path d="M70 38 q4 -3 8 0" stroke="#2c1810" stroke-width="2.2" fill="none" stroke-linecap="round" />
-        <path d="M42 47 q4 -5 8 0" stroke="#2c1810" stroke-width="2.6" fill="none" stroke-linecap="round" />
-        <path d="M70 47 q4 -5 8 0" stroke="#2c1810" stroke-width="2.6" fill="none" stroke-linecap="round" />
-        <path d="M40 42 l-2 -4 M45 40 l-1 -4.5 M50 39 l0 -4.5" stroke="#2c1810" stroke-width="1.4" fill="none"
-          stroke-linecap="round" />
-        <path d="M80 42 l2 -4 M75 40 l1 -4.5 M70 39 l0 -4.5" stroke="#2c1810" stroke-width="1.4" fill="none"
-          stroke-linecap="round" />
-        <circle cx="42" cy="58" r="5.5" fill="#ffb1a3" opacity=".65" />
-        <circle cx="78" cy="58" r="5.5" fill="#ffb1a3" opacity=".65" />
-        <path d="M46 62 q14 14 28 0 q-2 10 -14 10 q-12 0 -14 -10z" fill="#7a2a22" />
-        <path d="M50 64 q10 7 20 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" />
-        <g transform="translate(15 40)">
-          <path d="M0 0 l9 -5 l0 5 l9 -3 l-9 7 l0 5 z" fill="var(--red)" />
-          <circle cx="9" cy="2" r="2" fill="#fff6ea" />
-        </g>
-        <g transform="translate(105 40) scale(-1 1)">
-          <path d="M0 0 l9 -5 l0 5 l9 -3 l-9 7 l0 5 z" fill="var(--red)" />
-          <circle cx="9" cy="2" r="2" fill="#fff6ea" />
-        </g>
-        </svg>
+
         <h1 class="title-lg">I made something<br>for you</h1>
         <p>Do you wanna see it?</p>
         <div class="yn-row">
@@ -618,7 +601,9 @@
         <h1 class="title-lg">HAPPY<br><span class="script" style="font-size:50px;">Birthday</span></h1>
         <div class="polaroid">
           <div class="frame" id="photoFrame">
-            <img src="./imge/IMG20260411170503.jpg" alt=" My Photo">
+            <img src="./imge/IMG20260411170503.jpg" alt="My Photo"
+              onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+            <span class="plus image-fallback" aria-hidden="true">📷</span>
           </div>
         </div>
         <p contenteditable="true" id="birthdayMsg">Happiest birthday to the person who makes my ordinary days feel like
@@ -648,7 +633,6 @@
       </div>
     </section>
 
-    <!-- SCENE 4: memories -->
     <!-- SCENE 4: memories -->
     <section class="scene" data-scene="4">
       <div class="card">
@@ -725,14 +709,28 @@
 
       // swipe support
       let sx = 0, sy = 0;
-      document.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; });
+
+      document.addEventListener('touchstart', e => {
+        if (!e.touches.length) return;
+        sx = e.touches[0].clientX;
+        sy = e.touches[0].clientY;
+      }, { passive: true });
+
       document.addEventListener('touchend', e => {
+        if (!e.changedTouches.length) return;
+
         const dx = e.changedTouches[0].clientX - sx;
         const dy = e.changedTouches[0].clientY - sy;
+
         if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
-          if (dx < 0) go(current + 1); else go(current - 1);
+          if (dx < 0) {
+            go(current + 1);
+          } else {
+            go(current - 1);
+          }
         }
-      });
+      }, { passive: true });
+
       document.addEventListener('keydown', e => {
         if (e.key === 'ArrowRight') go(current + 1);
         if (e.key === 'ArrowLeft') go(current - 1);
@@ -749,7 +747,12 @@
           noBtn.textContent = 'YES';
           noBtn.className = 'btn';
           noBtn.style.left = '0px'; noBtn.style.top = '0px';
-          noBtn.onclick = () => go(1);
+          noBtn.onclick = () => {
+            bgMusic.play().catch(() => {
+              console.log("Autoplay blocked. Waiting for user interaction.");
+            });
+            go(1);
+          };
           noBtn.ontouchstart = null;
           return;
         }
@@ -761,24 +764,19 @@
       }
       noBtn.addEventListener('click', dodgeNo);
       noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodgeNo(); }, { passive: false });
-      yesBtn.addEventListener('click', () => go(1));
       const bgMusic = document.getElementById("bgMusic");
-
       bgMusic.volume = 1.0;
 
-      // Try to start automatically when page opens
-<<<<<<< HEAD
-      document.getElementById('yesBtn').addEventListener("click", () => {
+      // First real tap on YES: this user gesture satisfies mobile's
+      // autoplay policy, so we start the music here. Navigation to
+      // scene 1 always happens, whether or not the music succeeds.
+      yesBtn.addEventListener('click', () => {
         bgMusic.play().catch(() => {
           console.log("Autoplay blocked. Waiting for user interaction.");
-          go(1);
-=======
-      window.addEventListener("load", () => {
-        bgMusic.play().catch(() => {
-          console.log("Autoplay blocked. Waiting for user interaction.");
->>>>>>> 1fec98524594ebabd858e4f1757ab8fd28e81385
         });
+        go(1);
       });
+
       // ---- gifts ----
       document.querySelectorAll('.gift-box').forEach(box => {
         box.addEventListener('click', () => {
@@ -794,34 +792,33 @@
 
 
       // ---- candles ----
-      // ---- candles ----
       const candlesG = document.getElementById('candles');
 
-      const candleColors = [
-        '#e8564c',
-        '#e0a628',
-        '#4aa3df',
-        '#55b89a',
-        '#e8564c',
-        '#e0a628'
-      ];
+        const candleColors = [
+          '#e8564c',
+          '#e0a628',
+          '#4aa3df',
+          '#55b89a',
+          '#e8564c',
+          '#e0a628'
+        ];
 
-      const count = 6;
-      const startX = 55;
-      const gap = 22;
+        const count = 6;
+        const startX = 55;
+        const gap = 22;
 
-      for (let i = 0; i < count; i++) {
-        const x = startX + i * gap;
+        for (let i = 0; i < count; i++) {
+          const x = startX + i * gap;
 
-        const g = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'g'
-        );
+          const g = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'g'
+          );
 
-        g.setAttribute('class', 'candle');
-        g.setAttribute('data-i', i);
+          g.setAttribute('class', 'candle');
+          g.setAttribute('data-i', i);
 
-        g.innerHTML = `
+          g.innerHTML = `
         <!-- candle -->
         <rect
             x="${x - 3}"
@@ -860,81 +857,81 @@
         </g>
     `;
 
-        candlesG.appendChild(g);
-      }
-
-      const wishMsg = document.getElementById('wishMsg');
-
-      function checkCandles() {
-        const all = document.querySelectorAll('#candles .candle');
-        const outCount = document.querySelectorAll('#candles .candle.out').length;
-
-        if (outCount === all.length) {
-          wishMsg.textContent = 'Your wish will come true ✨';
-          burstConfetti();
-        } else {
-          wishMsg.textContent = '';
+          candlesG.appendChild(g);
         }
-      }
 
-      candlesG.addEventListener('click', e => {
-        const c = e.target.closest('.candle');
+        const wishMsg = document.getElementById('wishMsg');
 
-        if (!c) return;
+        function checkCandles() {
+          const all = document.querySelectorAll('#candles .candle');
+          const outCount = document.querySelectorAll('#candles .candle.out').length;
 
-        c.classList.toggle('out');
-        checkCandles();
-      });
-
-      // ---- memories title colors ----
-      const memTitle = document.getElementById('memTitle');
-      const letters = 'MEMORIES'.split('');
-      const bg = ['#b8272c', '#e0a628', '#e8564c'];
-      letters.forEach((ch, i) => {
-        const s = document.createElement('span');
-        s.textContent = ch;
-        s.style.background = bg[i % bg.length];
-        s.style.transform = 'rotate(' + ((i % 2 === 0 ? -4 : 4)) + 'deg)';
-        memTitle.appendChild(s);
-      });
-
-      // ---- memories photo slots ----
-      // ---- memories photo slots ----
-      // ---- memories photo slots ----
-      const memRow = document.getElementById('memRow');
-
-      const memories = [
-        {
-          image: './imge/IMG20251122161603.jpg',
-          caption: 'first date'
-        },
-        {
-          image: './imge/Snapchat-630699036.jpg',
-          caption: 'that trip'
-        },
-        {
-          image: './imge/IMG20260411122843.jpg',
-          caption: 'our song'
-        },
-        {
-          image: './imge/IMG20251122162520.jpg',
-          caption: 'just us'
-        },
-        {
-          image: './imge/IMG-20260617-WA0037.jpg',
-          caption: 'forever'
+          if (outCount === all.length) {
+            wishMsg.textContent = 'Your wish will come true ✨';
+            burstConfetti();
+          } else {
+            wishMsg.textContent = '';
+          }
         }
-      ];
 
-      memories.forEach((memory) => {
-        const slot = document.createElement('div');
-        slot.className = 'mem-slot';
+        candlesG.addEventListener('click', e => {
+          const c = e.target.closest('.candle');
 
-        slot.innerHTML = `
+          if (!c) return;
+
+          c.classList.toggle('out');
+          checkCandles();
+        });
+
+        // ---- memories title colors ----
+        const memTitle = document.getElementById('memTitle');
+        const letters = 'MEMORIES'.split('');
+        const bg = ['#b8272c', '#e0a628', '#e8564c'];
+        letters.forEach((ch, i) => {
+          const s = document.createElement('span');
+          s.textContent = ch;
+          s.style.background = bg[i % bg.length];
+          s.style.transform = 'rotate(' + ((i % 2 === 0 ? -4 : 4)) + 'deg)';
+          memTitle.appendChild(s);
+        });
+
+        // ---- memories photo slots ----
+        const memRow = document.getElementById('memRow');
+
+        const memories = [
+          {
+            image: './imge/IMG20251122161603.jpg',
+            caption: 'first date'
+          },
+          {
+            image: './imge/Snapchat-630699036.jpg',
+            caption: 'that trip'
+          },
+          {
+            image: './imge/IMG20260411122843.jpg',
+            caption: 'our song'
+          },
+          {
+            image: './imge/IMG20251122162520.jpg',
+            caption: 'just us'
+          },
+          {
+            image: './imge/IMG-20260617-WA0037.jpg',
+            caption: 'forever'
+          }
+        ];
+
+        memories.forEach((memory) => {
+          const slot = document.createElement('div');
+          slot.className = 'mem-slot';
+
+          slot.innerHTML = `
         <div class="peg"></div>
 
         <div class="box">
-            <img src="${memory.image}" alt="${memory.caption}">
+            <img src="${memory.image}" alt="${memory.caption}" loading="lazy"
+                 onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+            <span class="plus image-fallback" aria-hidden="true">📷</span>
         </div>
 
         <div class="mem-cap">
@@ -942,31 +939,31 @@
         </div>
     `;
 
-        memRow.appendChild(slot);
-      });
+          memRow.appendChild(slot);
+        });
 
-      // ---- confetti burst ----
-      function burstConfetti() {
-        const colors = ['#b8272c', '#e0a628', '#e8564c', '#f3c9c2'];
-        for (let i = 0; i < 40; i++) {
-          const p = document.createElement('div');
-          p.className = 'confetti-piece';
-          const size = 6 + Math.random() * 6;
-          p.style.width = size + 'px';
-          p.style.height = (size * 0.6) + 'px';
-          p.style.background = colors[Math.floor(Math.random() * colors.length)];
-          p.style.left = Math.random() * 100 + 'vw';
-          p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
-          document.body.appendChild(p);
-          const duration = 1800 + Math.random() * 1200;
-          p.animate([
-            { transform: p.style.transform + ' translateY(0)', opacity: 1 },
-            { transform: p.style.transform + ' translateY(100vh)', opacity: .9 }
-          ], { duration, easing: 'ease-in' });
-          setTimeout(() => p.remove(), duration + 50);
+        // ---- confetti burst ----
+        function burstConfetti() {
+          const colors = ['#b8272c', '#e0a628', '#e8564c', '#f3c9c2'];
+          for (let i = 0; i < 40; i++) {
+            const p = document.createElement('div');
+            p.className = 'confetti-piece';
+            const size = 6 + Math.random() * 6;
+            p.style.width = size + 'px';
+            p.style.height = (size * 0.6) + 'px';
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+            document.body.appendChild(p);
+            const duration = 1800 + Math.random() * 1200;
+            p.animate([
+              { transform: p.style.transform + ' translateY(0)', opacity: 1 },
+              { transform: p.style.transform + ' translateY(100vh)', opacity: .9 }
+            ], { duration, easing: 'ease-in' });
+            setTimeout(() => p.remove(), duration + 50);
+          }
         }
-      }
-    })();
+      })();
   </script>
 </body>
 
