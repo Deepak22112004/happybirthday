@@ -765,7 +765,16 @@
       noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodgeNo(); }, { passive: false });
       const bgMusic = document.getElementById("bgMusic");
       bgMusic.volume = 1.0;
-      bgMusic.load(); // start fetching/buffering the file immediately on page open
+
+      bgMusic.volume = 1.0;
+      fetch('./imge/54172.mp3')
+        .then(res => res.blob())
+        .then(blob => {
+          bgMusic.src = URL.createObjectURL(blob);
+        })
+        .catch(() => {
+          console.log('Background audio preload failed, falling back to default source.');
+        });// start fetching/buffering the file immediately on page open
 
       // First real tap on YES: this user gesture satisfies mobile's
       // autoplay policy, so we start the music here. Navigation to
